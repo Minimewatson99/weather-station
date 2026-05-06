@@ -44,7 +44,7 @@ event_data = {
 print("Initializing Weather Station...")
 
 # 1. Setup MQTT
-client = mqtt.Client(client_id="PiWeatherStation")
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="PiWeatherStation")
 try:
     client.connect(MQTT_BROKER, MQTT_PORT, 60)
     client.loop_start()
@@ -60,9 +60,10 @@ thunder = AS3935(address=0x02, bus=1) # 0x02 is the default ThunderBoard I2C add
 # aftershock = SDL_Pi_AfterShock.SDL_Pi_AfterShock()
 
 # Set ThunderBoard indoor/outdoor mode
-thunder.setIndoors(True) # Set to True if testing inside
-thunder.setNoiseFloor(2)
-thunder.setTuneCaps(0x03) # Calibration value (check SwitchDoc docs for your board)
+thunder.set_indoors(True) # Set to True if testing inside
+thunder.set_noise_floor(2)
+thunder.calibrate(tun_cap=0x09) # 9 matches your test script!
+thunder.set_min_strikes(1)
 
 # 3. Setup GPIO Interrupts
 GPIO.setmode(GPIO.BCM)
@@ -74,9 +75,9 @@ GPIO.setup(THUNDER_INT_PIN, GPIO.IN)
 def handle_lightning(channel):
     global event_data
     # Read the interrupt register from the ThunderBoard
-    interrupt_src = thunder.getInterruptSrc()
+    interrupt_src = thunder.get_interrupt()
     if interrupt_src == 0x08:
-        distance = thunder.getLightningDistKm()
+        distance = thunder.get_distance()
         print(f"*** LIGHTNING STRIKE DETECTED! Distance: {distance} km ***")
         event_data["lightning_detected"] = True
         event_data["lightning_distance_km"] = distance
