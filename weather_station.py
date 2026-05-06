@@ -120,8 +120,8 @@ try:
     while True:
         # 1. Read I2C Temp & Humidity (HDC1080)
         temp_c = hdc1080.readTemperature()
+        time.sleep(0.5) # <--- Add this tiny delay
         humidity = hdc1080.readHumidity()
-
         # 2. Read I2C Pressure (BME280)
         bme_data = bme280.sample(bus, BME280_ADDRESS, calibration_params)
         raw_pressure = bme_data.pressure
