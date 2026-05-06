@@ -60,7 +60,7 @@ class SDL_Pi_HDC1000:
                 fcntl.ioctl(HDC1000_fw, I2C_SLAVE, HDC1000_ADDRESS)
                 time.sleep(0.015) #15ms startup time
 
-                config = HDC1000_CONFIG_ACQUISITION_MODE 
+                config = 0x0000  # Sets chip to individual measurement mode
 
                 s = [HDC1000_CONFIGURATION_REGISTER,config>>8,0x00]
                 s2 = bytearray( s )
