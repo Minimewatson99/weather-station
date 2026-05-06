@@ -11,7 +11,7 @@ import RPi.GPIO as GPIO
 # --- Proprietary SwitchDoc Labs Imports ---
 try:
     import SDL_Pi_HDC1000
-    from SDL_Pi_Thunderboard_AS3935 import AS3935  # Updated exact import
+    from SDL_Pi_Thunderboard_AS3935 import AS3935
     # import SDL_Pi_AfterShock
 except ImportError as e:
     print(f"Missing SwitchDoc Labs library: {e}")
@@ -25,16 +25,14 @@ STATION_ALTITUDE_METERS = 117 # Replace with your actual elevation in meters
 
 # --- Pin Definitions ---
 LIGHT_SENSOR_PIN = 0 # GrovePi Analog Port A0
-# Connect these directly to Raspberry Pi GPIO header, NOT GrovePi ports!
 THUNDER_INT_PIN = 17 # RPi GPIO 17 (Pin 11)
 # QUAKE_INT1_PIN = 27  # RPi GPIO 27 (Pin 13)
 # QUAKE_INT2_PIN = 22  # RPi GPIO 22 (Pin 15)
 
 # --- I2C Addresses ---
-BME280_ADDRESS = 0x76 # Or 0x77 depending on your specific board
+BME280_ADDRESS = 0x77 # Or 0x77 depending on your specific board
 
 # --- Global State for Interrupt Data ---
-# We use this to store event data until the next MQTT publish cycle
 event_data = {
     "lightning_detected": False,
     "lightning_distance_km": 0
