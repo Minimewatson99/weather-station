@@ -119,9 +119,8 @@ print("System Active. Polling sensors and waiting for events...")
 try:
     while True:
         # 1. Read I2C Temp & Humidity (HDC1080)
-        temp_c = hdc1080.readTemperature()
-        humidity = hdc1080.readHumidity()
-        
+        temp_c, humidity = hdc1080.readTemperatureHumidity()
+
         # 2. Read I2C Pressure (BME280)
         bme_data = bme280.sample(bus, BME280_ADDRESS, calibration_params)
         raw_pressure = bme_data.pressure
@@ -159,7 +158,7 @@ try:
         event_data["lightning_distance_km"] = 0
         # event_data["earthquake_detected"] = False
         
-        time.sleep(60)
+        time.sleep(30)
 
 except KeyboardInterrupt:
     print("\nShutting down gracefully...")
