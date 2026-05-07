@@ -60,7 +60,7 @@ class SDL_Pi_HDC1000:
                 fcntl.ioctl(HDC1000_fw, I2C_SLAVE, HDC1000_ADDRESS)
                 time.sleep(0.015) #15ms startup time
 
-                config = 0x0000  # Sets chip to individual measurement mode
+                config = HDC1000_CONFIG_ACQUISITION_MODE
 
                 s = [HDC1000_CONFIGURATION_REGISTER,config>>8,0x00]
                 s2 = bytearray( s )
@@ -241,3 +241,25 @@ class SDL_Pi_HDC1000:
             serialNumber = serialNumber*256 + buf[0]*256 + buf[1] 
     
             return serialNumber
+        def readTemperatureHumidity(self):
+            # Trigger both measurements by writing to pointer 0x00
+            s = [HDC1000_TEMPERATURE_REGISTER] 
+            s2 = bytearray( s )
+            HDC1000_fw.write( s2 )
+                
+            # Wait for both 14-bit conversions to finish
+            time.sleep(0.0625) 
+                
+            # Read all 4 bytes at once (Temp High, Temp Low, Hum High, Hum Low)
+            data = HDC1000_fr.read(4) 
+            buf = array.array('B', data)
+                
+            # Calculate Temperature
+            raw_temp = (buf[0] * 256) + buf[1]
+            cTemp = (raw_temp / 65536.0) * 165.0 - 40.0
+                
+            # Calculate Humidity
+            raw_hum = (buf[2] * 256) + buf[3]
+            humidity = (raw_hum / 65536.0) * 100.0
+                
+            return cTemp, humidity
