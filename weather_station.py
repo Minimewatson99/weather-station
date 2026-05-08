@@ -119,14 +119,12 @@ print("System Active. Polling sensors and waiting for events...")
 try:
     while True:
         # 1. Read I2C Temp (HDC1080)
-        # We will just use it for temperature since we know that half works!
-        temp_c = hdc1080.readTemperature() 
+        temp_c = hdc1080.readTemperature()
+        humidity = None
 
-        # 2. Read I2C Pressure & Humidity (BME280)
+        # 2. Read I2C Pressure (BMP280)
         bme_data = bme280.sample(bus, BME280_ADDRESS, calibration_params)
         raw_pressure = bme_data.pressure
-        
-        humidity = bme_data.humidity
         # 3. Read Analog Light (GrovePi)
         try:
             light_level = grovepi.analogRead(LIGHT_SENSOR_PIN)
