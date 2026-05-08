@@ -118,7 +118,7 @@ try:
     while True:
         # 1. Read I2C Temp (HDC1080)
         temp_c = hdc1080.readTemperature()
-        humidity = None
+        humidity = hdc1080.readHumidity()
 
         # 2. Read I2C Pressure (BMP280)
         bme_data = bme280.sample(bus, BME280_ADDRESS, calibration_params)
