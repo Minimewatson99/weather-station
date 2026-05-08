@@ -45,27 +45,27 @@ print("Initializing Weather Station...")
 
 # 1. Setup MQTT
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="PiWeatherStation")
+
+client.username_pw_set("mqtt-weather", "MiniWeather") 
+
 try:
     client.connect(MQTT_BROKER, MQTT_PORT, 60)
     client.loop_start()
 except Exception as e:
     print(f"Failed to connect to MQTT: {e}")
-
 # 2. Setup I2C Bus & Sensors
 bus = smbus2.SMBus(1)
 calibration_params = bme280.load_calibration_params(bus, BME280_ADDRESS)
 
 hdc1080 = SDL_Pi_HDC1000.SDL_Pi_HDC1000()
-thunder = AS3935(address=0x02, bus=1) # 0x02 is the default ThunderBoard I2C address
+thunder = AS3935(address=0x02, bus=1)
 # aftershock = SDL_Pi_AfterShock.SDL_Pi_AfterShock()
 
-# Set ThunderBoard indoor/outdoor mode
-thunder.set_indoors(True) # Set to True if testing inside
+thunder.set_indoors(True)
 thunder.set_noise_floor(2)
-thunder.calibrate(tun_cap=0x09) # 9 matches your test script!
+thunder.calibrate(tun_cap=0x09)
 thunder.set_min_strikes(1)
 
-# 3. Setup GPIO Interrupts
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(THUNDER_INT_PIN, GPIO.IN)
 # GPIO.setup(QUAKE_INT1_PIN, GPIO.IN)
@@ -74,7 +74,6 @@ GPIO.setup(THUNDER_INT_PIN, GPIO.IN)
 # --- Interrupt Callbacks ---
 def handle_lightning(channel):
     global event_data
-    # Read the interrupt register from the ThunderBoard
     interrupt_src = thunder.get_interrupt()
     if interrupt_src == 0x08:
         distance = thunder.get_distance()
@@ -86,7 +85,6 @@ def handle_lightning(channel):
 
 # def handle_earthquake(channel):
 #     global event_data
-#     # If INT1 goes high, an earthquake is starting/occurring
 #     if GPIO.input(QUAKE_INT1_PIN):
 #         print("*** EARTHQUAKE DETECTED! Processing... ***")
 #         event_data["earthquake_detected"] = True
@@ -137,10 +135,10 @@ try:
 
         # 5. Build JSON Payload
         payload = {
-            "temperature_c": round(temp_c, 2),
-            "humidity_percent": round(humidity, 2),
+            "temperature_c": round(temp_c, 2) if temp_c is not None else None,
+            "humidity_percent": round(humidity, 2) if humidity is not None else None,
             "dew_point_c": dew_point,
-            "pressure_absolute_hpa": round(raw_pressure, 2),
+            "pressure_absolute_hpa": round(raw_pressure, 2) if raw_pressure is not None else None,
             "pressure_sealevel_hpa": slp,
             "light_level": light_level,
             "lightning_detected": event_data["lightning_detected"],
